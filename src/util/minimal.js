@@ -19,6 +19,9 @@ util.pool = require("@protobufjs/pool");
 // utility to work with the low and high bits of a 64 bit value
 util.LongBits = require("./longbits");
 
+// utility to work with Long.js's Long class.
+util.Long = require("./long");
+
 /**
  * Whether running within node or not.
  * @memberof util
@@ -157,23 +160,6 @@ util.newBuffer = function newBuffer(sizeOrArray) {
  * @type {Constructor<Uint8Array>}
  */
 util.Array = typeof Uint8Array !== "undefined" ? Uint8Array /* istanbul ignore next */ : Array;
-
-/**
- * Any compatible Long instance.
- * This is a minimal stand-alone definition of a Long instance. The actual type is that exported by long.js.
- * @interface Long
- * @property {number} low Low bits
- * @property {number} high High bits
- * @property {boolean} unsigned Whether unsigned or not
- */
-
-/**
- * Long.js's Long class if available.
- * @type {Constructor<Long>}
- */
-util.Long = /* istanbul ignore next */ util.global.dcodeIO && /* istanbul ignore next */ util.global.dcodeIO.Long
-         || /* istanbul ignore next */ util.global.Long
-         || util.inquire("long");
 
 /**
  * Regular expression used to verify 2 bit (`bool`) map keys.
