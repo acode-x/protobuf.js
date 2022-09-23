@@ -100,3 +100,31 @@ wrappers[".google.protobuf.Any"] = {
         return this.toObject(message, options);
     }
 };
+
+// https://github.com/protobufjs/protobuf.js/pull/1258
+// Custom wrapper for Timestamp
+wrappers[".google.protobuf.Timestamp"] = {
+    fromObject: function fromObject(object) {
+        if (typeof object !== 'string') {
+            if (object instanceof Date) {
+                return this.fromObject({
+                    seconds: Math.floor(object/1000),
+                    nanos: (object % 1000) * 1000000
+                });
+            }
+            return this.fromObject(object)
+        }
+        var dt = Date.parse(object);
+        if (isNaN(dt)) {
+            // not a number, default to the parent implementation
+            return this.fromObject(object);
+        }
+        return this.create({
+            seconds: Math.floor(dt/1000),
+            nanos: (dt % 1000) * 1000000
+        });
+    },
+    toObject: function toObject(message, options) {
+        return new Date(message.seconds*1000 + message.nanos/1000000)
+    }
+};

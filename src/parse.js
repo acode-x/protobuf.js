@@ -11,8 +11,6 @@ var tokenize  = require("./tokenize"),
     MapField  = require("./mapfield"),
     OneOf     = require("./oneof"),
     Enum      = require("./enum"),
-    Service   = require("./service"),
-    Method    = require("./method"),
     types     = require("./types"),
     util      = require("./util");
 
@@ -263,10 +261,6 @@ function parse(source, root, options) {
 
             case "enum":
                 parseEnum(parent, token);
-                return true;
-
-            case "service":
-                parseService(parent, token);
                 return true;
 
             case "extend":
@@ -679,76 +673,6 @@ function parse(source, root, options) {
             skip("]");
         }
         return parent;
-    }
-
-    function parseService(parent, token) {
-
-        /* istanbul ignore if */
-        if (!nameRe.test(token = next()))
-            throw illegal(token, "service name");
-
-        var service = new Service(token);
-        ifBlock(service, function parseService_block(token) {
-            if (parseCommon(service, token))
-                return;
-
-            /* istanbul ignore else */
-            if (token === "rpc")
-                parseMethod(service, token);
-            else
-                throw illegal(token);
-        });
-        parent.add(service);
-    }
-
-    function parseMethod(parent, token) {
-        // Get the comment of the preceding line now (if one exists) in case the
-        // method is defined across multiple lines.
-        var commentText = cmnt();
-
-        var type = token;
-
-        /* istanbul ignore if */
-        if (!nameRe.test(token = next()))
-            throw illegal(token, "name");
-
-        var name = token,
-            requestType, requestStream,
-            responseType, responseStream;
-
-        skip("(");
-        if (skip("stream", true))
-            requestStream = true;
-
-        /* istanbul ignore if */
-        if (!typeRefRe.test(token = next()))
-            throw illegal(token);
-
-        requestType = token;
-        skip(")"); skip("returns"); skip("(");
-        if (skip("stream", true))
-            responseStream = true;
-
-        /* istanbul ignore if */
-        if (!typeRefRe.test(token = next()))
-            throw illegal(token);
-
-        responseType = token;
-        skip(")");
-
-        var method = new Method(name, type, requestType, responseType, requestStream, responseStream);
-        method.comment = commentText;
-        ifBlock(method, function parseMethod_block(token) {
-
-            /* istanbul ignore else */
-            if (token === "option") {
-                parseOption(method, token);
-                skip(";");
-            } else
-                throw illegal(token);
-
-        });
-        parent.add(method);
     }
 
     function parseExtension(parent, token) {

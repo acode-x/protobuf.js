@@ -10,7 +10,6 @@ var Field    = require("./field"),
     OneOf    = require("./oneof");
 
 var Type,    // cyclic
-    Service,
     Enum;
 
 /**
@@ -143,7 +142,7 @@ Object.defineProperty(Namespace.prototype, "nestedArray", {
 /**
  * Any nested object descriptor.
  * @typedef AnyNestedObject
- * @type {IEnum|IType|IService|AnyExtensionField|INamespace|IOneOf}
+ * @type {IEnum|IType|AnyExtensionField|INamespace|IOneOf}
  */
 
 /**
@@ -174,8 +173,6 @@ Namespace.prototype.addJSON = function addJSON(nestedJson) {
                 ? Type.fromJSON
                 : nested.values !== undefined
                 ? Enum.fromJSON
-                : nested.methods !== undefined
-                ? Service.fromJSON
                 : nested.id !== undefined
                 ? Field.fromJSON
                 : Namespace.fromJSON )(names[i], nested)
@@ -217,7 +214,7 @@ Namespace.prototype.getEnum = function getEnum(name) {
  */
 Namespace.prototype.add = function add(object) {
 
-    if (!(object instanceof Field && object.extend !== undefined || object instanceof Type  || object instanceof OneOf || object instanceof Enum || object instanceof Service || object instanceof Namespace))
+    if (!(object instanceof Field && object.extend !== undefined || object instanceof Type  || object instanceof OneOf || object instanceof Enum || object instanceof Namespace))
         throw TypeError("object must be a valid nested object");
 
     if (!this.nested)
@@ -225,7 +222,7 @@ Namespace.prototype.add = function add(object) {
     else {
         var prev = this.get(object.name);
         if (prev) {
-            if (prev instanceof Namespace && object instanceof Namespace && !(prev instanceof Type || prev instanceof Service)) {
+            if (prev instanceof Namespace && object instanceof Namespace && !(prev instanceof Type)) {
                 // replace plain namespace but keep existing nested elements and options
                 var nested = prev.nestedArray;
                 for (var i = 0; i < nested.length; ++i)
@@ -313,7 +310,7 @@ Namespace.prototype.resolveAll = function resolveAll() {
 /**
  * Recursively looks up the reflection object matching the specified path in the scope of this namespace.
  * @param {string|string[]} path Path to look up
- * @param {*|Array.<*>} filterTypes Filter types, any combination of the constructors of `protobuf.Type`, `protobuf.Enum`, `protobuf.Service` etc.
+ * @param {*|Array.<*>} filterTypes Filter types, any combination of the constructors of `protobuf.Type`, `protobuf.Enum` etc.
  * @param {boolean} [parentAlreadyChecked=false] If known, whether the parent has already been checked
  * @returns {ReflectionObject|null} Looked up object or `null` if none could be found
  */
@@ -411,23 +408,8 @@ Namespace.prototype.lookupTypeOrEnum = function lookupTypeOrEnum(path) {
     return found;
 };
 
-/**
- * Looks up the {@link Service|service} at the specified path, relative to this namespace.
- * Besides its signature, this methods differs from {@link Namespace#lookup|lookup} in that it throws instead of returning `null`.
- * @param {string|string[]} path Path to look up
- * @returns {Service} Looked up service
- * @throws {Error} If `path` does not point to a service
- */
-Namespace.prototype.lookupService = function lookupService(path) {
-    var found = this.lookup(path, [ Service ]);
-    if (!found)
-        throw Error("no such Service '" + path + "' in " + this);
-    return found;
-};
-
 // Sets up cyclic dependencies (called in index-light)
-Namespace._configure = function(Type_, Service_, Enum_) {
+Namespace._configure = function(Type_, Enum_) {
     Type    = Type_;
-    Service = Service_;
     Enum    = Enum_;
 };

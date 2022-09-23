@@ -1,14 +1,8 @@
 "use strict";
 var util = exports;
 
-// used to return a Promise where callback is omitted
-util.asPromise = require("@protobufjs/aspromise");
-
 // converts to / from base64 encoded strings
 util.base64 = require("@protobufjs/base64");
-
-// base class of rpc.Service
-util.EventEmitter = require("@protobufjs/eventemitter");
 
 // float handling accross browsers
 util.float = require("@protobufjs/float");
@@ -288,7 +282,7 @@ function newError(name) {
             configurable: true,
         },
         name: {
-            get() { return name; },
+            get: function get() { return name; },
             set: undefined,
             enumerable: false,
             // configurable: false would accurately preserve the behavior of
@@ -298,7 +292,7 @@ function newError(name) {
             configurable: true,
         },
         toString: {
-            value() { return this.name + ": " + this.message; },
+            value: function value() { return this.name + ": " + this.message; },
             writable: true,
             enumerable: false,
             configurable: true,

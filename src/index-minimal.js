@@ -17,7 +17,6 @@ protobuf.BufferReader = require("./reader_buffer");
 
 // Utility
 protobuf.util         = require("./util/minimal");
-protobuf.rpc          = require("./rpc");
 protobuf.roots        = require("./roots");
 protobuf.configure    = configure;
 

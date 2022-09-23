@@ -12,14 +12,6 @@ var Type, // cyclic
     Enum;
 
 util.codegen = require("@protobufjs/codegen");
-util.fetch   = require("@protobufjs/fetch");
-util.path    = require("@protobufjs/path");
-
-/**
- * Node's fs module if available.
- * @type {Object.<string,*>}
- */
-util.fs = util.inquire("fs");
 
 /**
  * Converts an object's values to an array.

@@ -9,14 +9,12 @@ var Enum      = require("./enum"),
     OneOf     = require("./oneof"),
     Field     = require("./field"),
     MapField  = require("./mapfield"),
-    Service   = require("./service"),
     Message   = require("./message"),
     Reader    = require("./reader"),
     Writer    = require("./writer"),
     util      = require("./util"),
     encoder   = require("./encoder"),
     decoder   = require("./decoder"),
-    verifier  = require("./verifier"),
     converter = require("./converter"),
     wrappers  = require("./wrappers");
 
@@ -259,8 +257,6 @@ Type.fromJSON = function fromJSON(name, json) {
                 ? Type.fromJSON
                 : nested.values !== undefined
                 ? Enum.fromJSON
-                : nested.methods !== undefined
-                ? Service.fromJSON
                 : Namespace.fromJSON )(names[i], nested)
             );
         }
@@ -422,7 +418,7 @@ Type.prototype.create = function create(properties) {
 };
 
 /**
- * Sets up {@link Type#encode|encode}, {@link Type#decode|decode} and {@link Type#verify|verify}.
+ * Sets up {@link Type#encode|encode} and {@link Type#decode|decode}.
  * @returns {Type} `this`
  */
 Type.prototype.setup = function setup() {
@@ -444,10 +440,6 @@ Type.prototype.setup = function setup() {
         Reader : Reader,
         types  : types,
         util   : util
-    });
-    this.verify = verifier(this)({
-        types : types,
-        util  : util
     });
     this.fromObject = converter.fromObject(this)({
         types : types,
