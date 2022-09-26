@@ -64,7 +64,7 @@ Message.encode = function encode(message, writer) {
  * @template T extends Message<T>
  * @this Constructor<T>
  */
-Message.encodeDelimited = function encodeDelimited(message, writer) {
+ Message.encodeDelimited = function encodeDelimited(message, writer) {
     return this.$type.encodeDelimited(message, writer);
 };
 
@@ -90,19 +90,8 @@ Message.decode = function decode(reader) {
  * @template T extends Message<T>
  * @this Constructor<T>
  */
-Message.decodeDelimited = function decodeDelimited(reader) {
+ Message.decodeDelimited = function decodeDelimited(reader) {
     return this.$type.decodeDelimited(reader);
-};
-
-/**
- * Verifies a message of this type.
- * @name Message.verify
- * @function
- * @param {Object.<string,*>} message Plain object to verify
- * @returns {string|null} `null` if valid, otherwise the reason why it is not
- */
-Message.verify = function verify(message) {
-    return this.$type.verify(message);
 };
 
 /**

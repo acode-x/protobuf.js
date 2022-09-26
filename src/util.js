@@ -103,62 +103,6 @@ util.compareFieldsById = function compareFieldsById(a, b) {
 };
 
 /**
- * Decorator helper for types (TypeScript).
- * @param {Constructor<T>} ctor Constructor function
- * @param {string} [typeName] Type name, defaults to the constructor's name
- * @returns {Type} Reflected type
- * @template T extends Message<T>
- * @property {Root} root Decorators root
- */
-util.decorateType = function decorateType(ctor, typeName) {
-
-    /* istanbul ignore if */
-    if (ctor.$type) {
-        if (typeName && ctor.$type.name !== typeName) {
-            util.decorateRoot.remove(ctor.$type);
-            ctor.$type.name = typeName;
-            util.decorateRoot.add(ctor.$type);
-        }
-        return ctor.$type;
-    }
-
-    /* istanbul ignore next */
-    if (!Type)
-        Type = require("./type");
-
-    var type = new Type(typeName || ctor.name);
-    util.decorateRoot.add(type);
-    type.ctor = ctor; // sets up .encode, .decode etc.
-    Object.defineProperty(ctor, "$type", { value: type, enumerable: false });
-    Object.defineProperty(ctor.prototype, "$type", { value: type, enumerable: false });
-    return type;
-};
-
-var decorateEnumIndex = 0;
-
-/**
- * Decorator helper for enums (TypeScript).
- * @param {Object} object Enum object
- * @returns {Enum} Reflected enum
- */
-util.decorateEnum = function decorateEnum(object) {
-
-    /* istanbul ignore if */
-    if (object.$type)
-        return object.$type;
-
-    /* istanbul ignore next */
-    if (!Enum)
-        Enum = require("./enum");
-
-    var enm = new Enum("Enum" + decorateEnumIndex++, object);
-    util.decorateRoot.add(enm);
-    Object.defineProperty(object, "$type", { value: enm, enumerable: false });
-    return enm;
-};
-
-
-/**
  * Sets the value of a property by property path. If a value already exists, it is turned to an array
  * @param {Object.<string,*>} dst Destination object
  * @param {string} path dot '.' delimited path of the property to set
@@ -190,15 +134,3 @@ util.setProperty = function setProperty(dst, path, value) {
     path = path.split(".");
     return setProp(dst, path, value);
 };
-
-/**
- * Decorator root (TypeScript).
- * @name util.decorateRoot
- * @type {Root}
- * @readonly
- */
-Object.defineProperty(util, "decorateRoot", {
-    get: function() {
-        return roots["decorated"] || (roots["decorated"] = new (require("./root"))());
-    }
-});

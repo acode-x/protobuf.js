@@ -322,55 +322,6 @@ Field.prototype.resolve = function resolve() {
     return ReflectionObject.prototype.resolve.call(this);
 };
 
-/**
- * Decorator function as returned by {@link Field.d} and {@link MapField.d} (TypeScript).
- * @typedef FieldDecorator
- * @type {function}
- * @param {Object} prototype Target prototype
- * @param {string} fieldName Field name
- * @returns {undefined}
- */
-
-/**
- * Field decorator (TypeScript).
- * @name Field.d
- * @function
- * @param {number} fieldId Field id
- * @param {"double"|"float"|"int32"|"uint32"|"sint32"|"fixed32"|"sfixed32"|"int64"|"uint64"|"sint64"|"fixed64"|"sfixed64"|"string"|"bool"|"bytes"|Object} fieldType Field type
- * @param {"optional"|"required"|"repeated"} [fieldRule="optional"] Field rule
- * @param {T} [defaultValue] Default value
- * @returns {FieldDecorator} Decorator function
- * @template T extends number | number[] | Long | Long[] | string | string[] | boolean | boolean[] | Uint8Array | Uint8Array[] | Buffer | Buffer[]
- */
-Field.d = function decorateField(fieldId, fieldType, fieldRule, defaultValue) {
-
-    // submessage: decorate the submessage and use its name as the type
-    if (typeof fieldType === "function")
-        fieldType = util.decorateType(fieldType).name;
-
-    // enum reference: create a reflected copy of the enum and keep reuseing it
-    else if (fieldType && typeof fieldType === "object")
-        fieldType = util.decorateEnum(fieldType).name;
-
-    return function fieldDecorator(prototype, fieldName) {
-        util.decorateType(prototype.constructor)
-            .add(new Field(fieldName, fieldId, fieldType, fieldRule, { "default": defaultValue }));
-    };
-};
-
-/**
- * Field decorator (TypeScript).
- * @name Field.d
- * @function
- * @param {number} fieldId Field id
- * @param {Constructor<T>|string} fieldType Field type
- * @param {"optional"|"required"|"repeated"} [fieldRule="optional"] Field rule
- * @returns {FieldDecorator} Decorator function
- * @template T extends Message<T>
- * @variation 2
- */
-// like Field.d but without a default value
-
 // Sets up cyclic dependencies (called in index-light)
 Field._configure = function configure(Type_) {
     Type = Type_;

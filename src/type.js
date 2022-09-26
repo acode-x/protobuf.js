@@ -211,7 +211,6 @@ function clearCache(type) {
     type._fieldsById = type._fieldsArray = type._oneofsArray = null;
     delete type.encode;
     delete type.decode;
-    delete type.verify;
     return type;
 }
 
@@ -483,7 +482,7 @@ Type.prototype.encode = function encode_setup(message, writer) {
  * @param {Writer} [writer] Writer to encode to
  * @returns {Writer} writer
  */
-Type.prototype.encodeDelimited = function encodeDelimited(message, writer) {
+ Type.prototype.encodeDelimited = function encodeDelimited(message, writer) {
     return this.encode(message, writer && writer.len ? writer.fork() : writer).ldelim();
 };
 
@@ -506,19 +505,10 @@ Type.prototype.decode = function decode_setup(reader, length) {
  * @throws {Error} If the payload is not a reader or valid buffer
  * @throws {util.ProtocolError} If required fields are missing
  */
-Type.prototype.decodeDelimited = function decodeDelimited(reader) {
+ Type.prototype.decodeDelimited = function decodeDelimited(reader) {
     if (!(reader instanceof Reader))
         reader = Reader.create(reader);
     return this.decode(reader, reader.uint32());
-};
-
-/**
- * Verifies that field values are valid and that required fields are present.
- * @param {Object.<string,*>} message Plain object to verify
- * @returns {null|string} `null` if valid, otherwise the reason why it is not
- */
-Type.prototype.verify = function verify_setup(message) {
-    return this.setup().verify(message); // overrides this method
 };
 
 /**
@@ -557,25 +547,4 @@ Type.prototype.fromObject = function fromObject(object) {
  */
 Type.prototype.toObject = function toObject(message, options) {
     return this.setup().toObject(message, options);
-};
-
-/**
- * Decorator function as returned by {@link Type.d} (TypeScript).
- * @typedef TypeDecorator
- * @type {function}
- * @param {Constructor<T>} target Target constructor
- * @returns {undefined}
- * @template T extends Message<T>
- */
-
-/**
- * Type decorator (TypeScript).
- * @param {string} [typeName] Type name, defaults to the constructor's name
- * @returns {TypeDecorator<T>} Decorator function
- * @template T extends Message<T>
- */
-Type.d = function decorateType(typeName) {
-    return function typeDecorator(target) {
-        util.decorateType(target, typeName);
-    };
 };

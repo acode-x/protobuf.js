@@ -170,34 +170,3 @@ OneOf.prototype.onRemove = function onRemove(parent) {
             field.parent.remove(field);
     ReflectionObject.prototype.onRemove.call(this, parent);
 };
-
-/**
- * Decorator function as returned by {@link OneOf.d} (TypeScript).
- * @typedef OneOfDecorator
- * @type {function}
- * @param {Object} prototype Target prototype
- * @param {string} oneofName OneOf name
- * @returns {undefined}
- */
-
-/**
- * OneOf decorator (TypeScript).
- * @function
- * @param {...string} fieldNames Field names
- * @returns {OneOfDecorator} Decorator function
- * @template T extends string
- */
-OneOf.d = function decorateOneOf() {
-    var fieldNames = new Array(arguments.length),
-        index = 0;
-    while (index < arguments.length)
-        fieldNames[index] = arguments[index++];
-    return function oneOfDecorator(prototype, oneofName) {
-        util.decorateType(prototype.constructor)
-            .add(new OneOf(oneofName, fieldNames));
-        Object.defineProperty(prototype, oneofName, {
-            get: util.oneOfGetter(fieldNames),
-            set: util.oneOfSetter(fieldNames)
-        });
-    };
-};
