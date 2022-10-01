@@ -19,9 +19,6 @@ util.pool = require("@protobufjs/pool");
 // utility to work with the low and high bits of a 64 bit value
 util.LongBits = require("./longbits");
 
-// utility to work with Long.js's Long class.
-util.Long = require("./long");
-
 /**
  * Whether running within node or not.
  * @memberof util
@@ -115,21 +112,7 @@ util.isSet = function isSet(obj, prop) {
  * @interface Buffer
  * @extends Uint8Array
  */
-
-/**
- * Node's Buffer class if available.
- * @type {Constructor<Buffer>}
- */
-util.Buffer = (function() {
-    try {
-        var Buffer = util.inquire("buffer").Buffer;
-        // refuse to use non-node buffers if not explicitly assigned (perf reasons):
-        return Buffer.prototype.utf8Write ? Buffer : /* istanbul ignore next */ null;
-    } catch (e) {
-        /* istanbul ignore next */
-        return null;
-    }
-})();
+util.Buffer = null;
 
 // Internal alias of or polyfull for Buffer.from.
 util._Buffer_from = null;
